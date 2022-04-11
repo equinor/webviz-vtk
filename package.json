@@ -1,0 +1,70 @@
+{
+  "name": "webviz_vtk",
+  "version": "0.0.9",
+  "description": "React based declarative usage of vtk.js for Dash",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Equinor/webviz-vtk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Equinor/webviz-vtk/issues"
+  },
+  "homepage": "https://github.com/Equinor/webviz-vtk",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "webpack-serve --config ./webpack.serve.config.js --open",
+    "validate-init": "python _validate_init.py",
+    "prepublishOnly": "npm run validate-init",
+    "build:js": "webpack --mode production",
+    "build:py": "dash-generate-components ./src/lib/dash webviz_vtk -p package-info.json",
+    "build": "npm run build:js && npm run build:py"
+  },
+  "author": "R&T Equinor <hakal@equinor.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@plotly/dash-component-plugins": "^1.2.0"
+  },
+  "peerDependencies": {
+    "@kitware/vtk.js": "^21.3.0",
+    "react": "^16.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-react": "^7.0.0",
+    "@kitware/vtk.js": "^23.0.0",
+    "@plotly/webpack-dash-dynamic-import": "^1.2.0",
+    "babel-eslint": "^10.0.2",
+    "babel-loader": "^8.0.6",
+    "copyfiles": "^2.1.1",
+    "css-loader": "^3.0.0",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-react": "^7.14.2",
+    "npm": "^6.1.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-docgen": "^4.1.1",
+    "react-dom": "^16.8.6",
+    "style-loader": "^0.23.1",
+    "styled-jsx": "^3.2.1",
+    "terser-webpack-plugin": "^2.3.8",
+    "webpack": "4.36.1",
+    "webpack-cli": "3.3.6",
+    "webpack-serve": "3.1.0"
+  },
+  "engines": {
+    "node": ">=8.11.0",
+    "npm": ">=6.1.0"
+  },
+  "files": [
+    "webviz_vtk",
+    "src",
+    "README.md",
+    "docs",
+    "dist"
+  ]
+}
