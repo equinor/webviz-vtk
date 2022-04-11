@@ -226,24 +226,31 @@ export default class View extends Component {
       this.hasFocus = false;
     };
 
+    const getSelection = (x, y) => {
+      const tolerance = this.getPointerSizeTolerance();
+      return this.pickClosest(
+        Math.floor(x),
+        Math.floor(y),
+        tolerance
+      );
+    }
+
+    const handleMouseDown = (callback, { x, y }, event) => {
+      const selection = getSelection(x, y)
+      if (selection?.length) {
+        this.style.setCenterOfRotation(selection[0].worldPosition);
+      }
+    }
     // Handle picking
     const handlePicking = (callback, pickingMode, { x, y }, event) => {
       if (this.props.pickingModes.indexOf(pickingMode) === -1) {
         return;
       }
-      const tolerance = this.getPointerSizeTolerance();
-      const selection = this.pickClosest(
-        Math.floor(x),
-        Math.floor(y),
-        tolerance
-      );
+
+      const selection = getSelection(x, y)
 
       // Share the selection with the rest of the world
-      if (pickingMode === 'click') {
-        if (selection?.length) {
-          this.style.setCenterOfRotation(selection[0].worldPosition);
-        }
-      }
+
       if (callback) {
         callback(selection[0], event);
       }
@@ -258,12 +265,7 @@ export default class View extends Component {
         return;
       }
 
-      const tolerance = this.getPointerSizeTolerance();
-      const selection = this.pickClosest(
-        Math.floor(x),
-        Math.floor(y),
-        tolerance
-      );
+
 
       // Guard against trigger of empty selection
       if (this.lastSelection.length === 0 && selection.length === 0) {
@@ -306,9 +308,8 @@ export default class View extends Component {
         e
       );
     this.onMouseDown = (e) =>
-      handlePicking(
+      handleMouseDown(
         this.props.onMouseDown,
-        'mouseDown',
         this.getScreenEventPositionFor(e),
         e
       );
@@ -825,7 +826,7 @@ View.propTypes = {
    * List of picking listeners to bind. By default it is disabled (empty array).
    */
   pickingModes: PropTypes.arrayOf(
-    PropTypes.oneOf(['click', 'hover', 'select', 'mouseDown', 'mouseUp'])
+    PropTypes.oneOf(['click', 'hover', 'select'])
   ),
 
   /**
