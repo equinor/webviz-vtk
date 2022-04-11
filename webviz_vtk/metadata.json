@@ -1,0 +1,609 @@
+{
+  "src/lib/dash/Algorithm.react.js": {
+    "description": "Algorithm is exposing a source or filter to a downstream filter\nIt takes the following set of properties:\n  - vtkClass: vtkClassName\n  - state: {}",
+    "displayName": "Algorithm",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component."
+      },
+      "port": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "downstream connection port",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "vtkClass": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "vtkClass name",
+        "defaultValue": {
+          "value": "'vtkConeSource'",
+          "computed": false
+        }
+      },
+      "state": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "set of property values for vtkClass",
+        "defaultValue": {
+          "value": "{}",
+          "computed": false
+        }
+      },
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/CellData.react.js": {
+    "description": "CellData is exposing a vtkCellData to a downstream element",
+    "displayName": "CellData",
+    "methods": [],
+    "props": {
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/DataArray.react.js": {
+    "description": "DataArray is creating a vtkDataArray for the container fields\nIt takes the following set of properties:\n  - type: 'Float32Array', 'Float64Array', 'Uint16Array', ...\n  - values: [number, number, ...]\n  - numberOfComponents: 1,\n  - registration: 'addArray', 'setScalars', ...",
+    "displayName": "DataArray",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component."
+      },
+      "type": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Typed array name",
+        "defaultValue": {
+          "value": "'Float32Array'",
+          "computed": false
+        }
+      },
+      "name": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Field name",
+        "defaultValue": {
+          "value": "'scalars'",
+          "computed": false
+        }
+      },
+      "values": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "Actual values to use inside our array",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      },
+      "numberOfComponents": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Number of components / Tuple size",
+        "defaultValue": {
+          "value": "1",
+          "computed": false
+        }
+      },
+      "registration": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Name of the method to call on the fieldData (addArray, setScalars, setVectors...)",
+        "defaultValue": {
+          "value": "'addArray'",
+          "computed": false
+        }
+      }
+    }
+  },
+  "src/lib/dash/FieldData.react.js": {
+    "description": "FieldData is exposing a FieldData to a downstream element",
+    "displayName": "FieldData",
+    "methods": [],
+    "props": {
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/GeometryRepresentation.react.js": {
+    "description": "GeometryRepresentation is responsible to convert a vtkPolyData into rendering\nIt takes the following set of properties:\n  - actor: Properties to assign to the vtkActor\n  - mapper: Properties to assign to the vtkMapper\n  - property: Properties to assign to the vtkProperty (actor.getProperty())\n  - colorMapPreset: Name of the preset to use for controlling the color mapping\n  - colorDataRange: Range to use for the color scale",
+    "displayName": "GeometryRepresentation",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component."
+      },
+      "actor": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Properties to set to the actor"
+      },
+      "mapper": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Properties to set to the actor"
+      },
+      "property": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Properties to set to the actor.property"
+      },
+      "colorMapPreset": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Preset name for the lookup table color map",
+        "defaultValue": {
+          "value": "'erdc_rainbow_bright'",
+          "computed": false
+        }
+      },
+      "colorDataRange": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "Data range use for the colorMap",
+        "defaultValue": {
+          "value": "[0, 1]",
+          "computed": false
+        }
+      },
+      "showCubeAxes": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Show/Hide Cube Axes for the given representation",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "cubeAxesStyle": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Configure cube Axes style by overriding the set of properties defined\nhttps://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719"
+      },
+      "showScalarBar": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Show hide scalar bar for that representation",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "scalarBarTitle": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Use given string as title for scalar bar. By default it is empty (no title).",
+        "defaultValue": {
+          "value": "''",
+          "computed": false
+        }
+      },
+      "scalarBarStyle": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Configure scalar bar style by overriding the set of properties defined\nhttps://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796"
+      },
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/PointData.react.js": {
+    "description": "PointData is exposing a vtkPointData to a downstream element",
+    "displayName": "PointData",
+    "methods": [],
+    "props": {
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/PolyData.react.js": {
+    "description": "PolyData is exposing a vtkPolyData to a downstream filter\nIt takes the following set of properties:\n  - points: [x, y, z, x, y, z, ...],\n  - verts: [cellSize, pointId0, pointId1, ..., cellSize, pointId0, ...]\n  - lines: [cellSize, pointId0, pointId1, ..., cellSize, pointId0, ...]\n  - polys: [cellSize, pointId0, pointId1, ..., cellSize, pointId0, ...]\n  - strips: [cellSize, pointId0, pointId1, ..., cellSize, pointId0, ...]\nCell connectivity helper property:\n  - connectivity: 'manual', // [manual, points, triangles, strips]",
+    "displayName": "PolyData",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component."
+      },
+      "port": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "downstream connection port",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "points": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "xyz coordinates",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      },
+      "verts": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "verts cells"
+      },
+      "lines": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "lines cells"
+      },
+      "polys": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "polys cells"
+      },
+      "strips": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number"
+          }
+        },
+        "required": false,
+        "description": "strips cells"
+      },
+      "connectivity": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`",
+        "defaultValue": {
+          "value": "'manual'",
+          "computed": false
+        }
+      },
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/dash/View.react.js": {
+    "description": "View is responsible to render vtk.js data.\nIt takes the following set of properties:\n  - `background`: [0.2, 0.3, 0.4]\n  - `cameraPosition`: [0, 0, 1]\n  - `cameraViewUp`: [0, 1, 0]\n  - `cameraParallelProjection`: false\n  - `showOrientationAxes`: true",
+    "displayName": "View",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component."
+      },
+      "style": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Allow user to override the default View style { width: '100%', height: '100%' }",
+        "defaultValue": {
+          "value": "{\n  width: '100%',\n  height: '100%',\n}",
+          "computed": false
+        }
+      },
+      "className": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Allow user to provide custom className associated to root element"
+      },
+      "background": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "The color of the view background using 3 floating numbers\nbetween 0-1 of Red, Green, Blue component.",
+        "defaultValue": {
+          "value": "[0.2, 0.3, 0.4]",
+          "computed": false
+        }
+      },
+      "interactorSettings": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Configure the interactions",
+        "defaultValue": {
+          "value": "[\n  {\n    button: 1,\n    action: 'Rotate',\n  },\n  {\n    button: 2,\n    action: 'Pan',\n  },\n  {\n    button: 3,\n    action: 'Zoom',\n    scrollEnabled: true,\n  },\n  {\n    button: 1,\n    action: 'Pan',\n    shift: true,\n  },\n  {\n    button: 1,\n    action: 'Zoom',\n    alt: true,\n  },\n  {\n    button: 1,\n    action: 'ZoomToMouse',\n    control: true,\n  },\n  {\n    button: 1,\n    action: 'Roll',\n    alt: true,\n    shift: true,\n  },\n]",
+          "computed": false
+        }
+      },
+      "cameraPosition": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Initial camera position from an object in [0,0,0]",
+        "defaultValue": {
+          "value": "[0, 0, 1]",
+          "computed": false
+        }
+      },
+      "cameraViewUp": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Initial camera position from an object in [0,0,0]",
+        "defaultValue": {
+          "value": "[0, 1, 0]",
+          "computed": false
+        }
+      },
+      "cameraParallelProjection": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Use parallel projection (default: false)",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "triggerRender": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Property use to trigger a render when changing.",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "triggerResetCamera": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "Property use to trigger a resetCamera when changing.",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "pickingModes": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "string"
+          }
+        },
+        "required": false,
+        "description": "List of picking listeners to bind. The supported values are `click` and `hover`. By default it is disabled (empty array)."
+      },
+      "clickInfo": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Read-only prop. To use this, make sure that `pickingModes` contains `click`.\nThis prop is updated when an element in the map is clicked. This contains\nthe picking info describing the object being clicked on."
+      },
+      "hoverInfo": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Read-only prop. To use this, make sure that `pickingModes` contains `hover`.\nThis prop is updated when an element in the map is hovered. This contains\nthe picking info describing the object being hovered."
+      },
+      "children": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "node"
+              }
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        "required": false,
+        "description": "List of representation to show"
+      },
+      "showOrientationAxes": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Show/Hide orientation axes.",
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        }
+      }
+    }
+  }
+}
