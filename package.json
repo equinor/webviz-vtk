@@ -25,7 +25,7 @@
     "@plotly/dash-component-plugins": "^1.2.0"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^21.3.0",
+    "@kitware/vtk.js": "^24.3.1",
     "react": "^16.0.0"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-react": "^7.0.0",
-    "@kitware/vtk.js": "^23.0.0",
+    "@kitware/vtk.js": "^24.3.1",
     "@plotly/webpack-dash-dynamic-import": "^1.2.0",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
