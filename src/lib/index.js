@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 
-import './vtk/availableClasses'
+
 
 import Algorithm from './dash/Algorithm.react';
 import CellData from './dash/CellData.react';

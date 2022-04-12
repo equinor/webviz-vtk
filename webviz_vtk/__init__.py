@@ -64,6 +64,22 @@ _js_dist = [
         "namespace": package_name,
         "dynamic": True,
     },
+    {
+        "relative_package_path": "async-ReactVTKClasses.js",
+        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTKClasses.js".format(
+            package_name, __name__, __version__
+        ),
+        "namespace": package_name,
+        "async": True,
+    },
+    {
+        "relative_package_path": "async-ReactVTKClasses.js.map",
+        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTKClasses.js.map".format(
+            package_name, __name__, __version__
+        ),
+        "namespace": package_name,
+        "dynamic": True,
+    },
 ]
 
 _css_dist = []
