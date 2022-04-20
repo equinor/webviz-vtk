@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "baseUrl": "src/lib",
+    "inlineSources": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "target": "ES6",
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

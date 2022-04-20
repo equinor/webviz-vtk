@@ -15,10 +15,11 @@ It takes the following set of properties:
 
 Keyword arguments:
 
-- children (list of a list of or a singular dash component, string or numbers | a list of or a singular dash component, string or number; optional)
+- children (boolean | number | string | dict | list; optional)
 
 - id (string; optional):
-    The ID used to identify this component.
+    The ID used to identify this component.   Unique ID to identify
+    this component in Dash callbacks.
 
 - actor (dict; optional):
     Properties to set to the actor.
@@ -32,7 +33,7 @@ Keyword arguments:
 - cubeAxesStyle (dict; optional):
     Configure cube Axes style by overriding the set of properties
     defined
-    https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719.
+    https?://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L71;.
 
 - mapper (dict; optional):
     Properties to set to the actor.
@@ -43,7 +44,7 @@ Keyword arguments:
 - scalarBarStyle (dict; optional):
     Configure scalar bar style by overriding the set of properties
     defined
-    https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796.
+    https?://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L79;.
 
 - scalarBarTitle (string; default ''):
     Use given string as title for scalar bar. By default it is empty

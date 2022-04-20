@@ -1,9 +1,2 @@
-include webviz_vtk/webviz_vtk.min.js
-include webviz_vtk/webviz_vtk.min.js.map
-include webviz_vtk/async-ReactVTK.js
-include webviz_vtk/async-ReactVTK.js.map
-include webviz_vtk/metadata.json
-include webviz_vtk/package-info.json
-include README.md
-include LICENSE
-include package.json
+recursive-include webviz_vtk/** *.js *.css *.json *.html
+prune tests

@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataArray as VtkItem } from '../AsyncReactVTK';
-
+import { DashComponentProps } from '../props';
 /**
  * DataArray is creating a vtkDataArray for the container fields
  * It takes the following set of properties:
@@ -11,9 +10,42 @@ import { DataArray as VtkItem } from '../AsyncReactVTK';
  *   - numberOfComponents: 1,
  *   - registration: 'addArray', 'setScalars', ...
  */
-export default function DataArray(props) {
+export default function DataArray(props: DataArrayProps) {
   return <React.Suspense fallback={null}><VtkItem {...props} /></React.Suspense>;
 };
+
+type DataArrayProps = {
+  /**
+   * Current color value
+   */
+  id?: string;
+
+  /**
+   * Typed array name
+   */
+  type?: string;
+
+  /**
+   * Field name
+   */
+  name?: string;
+
+  /**
+   * Actual values to use inside our array
+   */
+  values?: Array<number>;
+
+  /**
+   * Number of components / Tuple size
+   */
+  numberOfComponents?: number;
+
+  /**
+   * Name of the method to call on the fieldData (addArray, setScalars, setVectors...)
+   */
+  registration?: string;
+
+} & DashComponentProps;
 
 DataArray.defaultProps = {
   name: 'scalars',
@@ -21,36 +53,4 @@ DataArray.defaultProps = {
   values: [],
   numberOfComponents: 1,
   registration: 'addArray',
-};
-
-DataArray.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Typed array name
-   */
-  type: PropTypes.string,
-
-  /**
-   * Field name
-   */
-  name: PropTypes.string,
-
-  /**
-   * Actual values to use inside our array
-   */
-  values: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Number of components / Tuple size
-   */
-  numberOfComponents: PropTypes.number,
-
-  /**
-   * Name of the method to call on the fieldData (addArray, setScalars, setVectors...)
-   */
-  registration: PropTypes.string,
 };

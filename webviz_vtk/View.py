@@ -15,23 +15,24 @@ It takes the following set of properties:
 
 Keyword arguments:
 
-- children (list of a list of or a singular dash component, string or numbers | a list of or a singular dash component, string or number; optional):
+- children (boolean | number | string | dict | list; optional):
     List of representation to show.
 
 - id (string; optional):
-    The ID used to identify this component.
+    Current color value   Unique ID to identify this component in Dash
+    callbacks.
 
-- background (list; default [0.2, 0.3, 0.4]):
+- background (list of numbers; default [0.2, 0.3, 0.4]):
     The color of the view background using 3 floating numbers between
     0-1 of Red, Green, Blue component.
 
 - cameraParallelProjection (boolean; default False):
-    Use parallel projection (default: False).
+    Use parallel projection (default?: False;.
 
-- cameraPosition (list; default [0, 0, 1]):
+- cameraPosition (list of numbers; default [0, 0, 1]):
     Initial camera position from an object in [0,0,0].
 
-- cameraViewUp (list; default [0, 1, 0]):
+- cameraViewUp (list of numbers; default [0, 1, 0]):
     Initial camera position from an object in [0,0,0].
 
 - className (string; optional):
@@ -49,17 +50,17 @@ Keyword arguments:
     is hovered. This contains the picking info describing the object
     being hovered.
 
-- interactorSettings (list; default [  {    button: 1,    action: 'Rotate',  },  {    button: 2,    action: 'Pan',  },  {    button: 3,    action: 'Zoom',    scrollEnabled: True,  },  {    button: 1,    action: 'Pan',    shift: True,  },  {    button: 1,    action: 'Zoom',    alt: True,  },  {    button: 1,    action: 'ZoomToMouse',    control: True,  },  {    button: 1,    action: 'Roll',    alt: True,    shift: True,  },]):
+- interactorSettings (list of dicts; default [    {      button: 1,      action: 'Rotate',    },    {      button: 2,      action: 'Pan',    },    {      button: 3,      action: 'Zoom',      scrollEnabled: True,    },    {      button: 1,      action: 'Pan',      shift: True,    },    {      button: 1,      action: 'Zoom',      alt: True,    },    {      button: 1,      action: 'ZoomToMouse',      control: True,    },    {      button: 1,      action: 'Roll',      alt: True,      shift: True,    },  ]):
     Configure the interactions.
 
-- pickingModes (list of strings; optional):
+- pickingModes (list of a value equal to: 'click', 'hover', 'select's; optional):
     List of picking listeners to bind. The supported values are
     `click` and `hover`. By default it is disabled (empty array).
 
 - showOrientationAxes (boolean; default True):
     Show/Hide orientation axes.
 
-- style (dict; default {  width: '100%',  height: '100%',}):
+- style (dict; default {    width: '100%',    height: '100%',  }):
     Allow user to override the default View style { width: '100%',
     height: '100%' }.
 

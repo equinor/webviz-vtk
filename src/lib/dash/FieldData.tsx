@@ -1,20 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
+import { DashComponentProps } from '../props';
 import { FieldData as VtkItem } from '../AsyncReactVTK';
 
 /**
  * FieldData is exposing a FieldData to a downstream element
  */
-export default function FieldData(props) {
+export default function FieldData(props: FieldDataProps) {
   return <React.Suspense fallback={null}><VtkItem {...props} /></React.Suspense>;
 };
 
-FieldData.defaultProps = {};
+type FieldDataProps = {
+  children?: any;
+} & DashComponentProps;
 
-FieldData.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};

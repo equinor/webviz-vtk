@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { GeometryRepresentation as VtkItem } from '../AsyncReactVTK';
+import { DashComponentProps } from '../props';
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
@@ -12,7 +13,7 @@ import { GeometryRepresentation as VtkItem } from '../AsyncReactVTK';
  *   - colorMapPreset: Name of the preset to use for controlling the color mapping
  *   - colorDataRange: Range to use for the color scale
  */
-export default function GeometryRepresentation(props) {
+export default function GeometryRepresentation(props: GeometryRepresentationProps) {
   return <React.Suspense fallback={null}><VtkItem {...props} /></React.Suspense>;
 };
 
@@ -24,66 +25,65 @@ GeometryRepresentation.defaultProps = {
   scalarBarTitle: '',
 };
 
-GeometryRepresentation.propTypes = {
+type GeometryRepresentationProps = {
   /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
+    * The ID used to identify this component.
+    */
+  id?: string;
 
   /**
    * Properties to set to the actor
    */
-  actor: PropTypes.object,
+  actor?: object;
 
   /**
    * Properties to set to the actor
    */
-  mapper: PropTypes.object,
+  mapper?: object;
 
   /**
    * Properties to set to the actor.property
    */
-  property: PropTypes.object,
+  property?: object;
 
   /**
    * Preset name for the lookup table color map
    */
-  colorMapPreset: PropTypes.string,
+  colorMapPreset?: string;
 
   /**
    * Data range use for the colorMap
    */
-  colorDataRange: PropTypes.arrayOf(PropTypes.number),
+  colorDataRange?: Array<number>;
 
   /**
    * Show/Hide Cube Axes for the given representation
    */
-  showCubeAxes: PropTypes.bool,
+  showCubeAxes?: boolean;
 
   /**
    * Configure cube Axes style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+   * https?://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L71;
    */
-  cubeAxesStyle: PropTypes.object,
+  cubeAxesStyle?: object;
 
   /**
    * Show hide scalar bar for that representation
    */
-  showScalarBar: PropTypes.bool,
+  showScalarBar?: boolean;
 
   /**
    * Use given string as title for scalar bar. By default it is empty (no title).
    */
-  scalarBarTitle: PropTypes.string,
+  scalarBarTitle?: string;
 
   /**
    * Configure scalar bar style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
+   * https?://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L79;
    */
-  scalarBarStyle: PropTypes.object,
+  scalarBarStyle?: object;
 
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};
+
+  children?: any;
+
+} & DashComponentProps;

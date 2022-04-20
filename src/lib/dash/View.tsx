@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View as VtkItem } from '../AsyncReactVTK';
-
+import { DashComponentProps } from '../props';
 /**
  * View is responsible to render vtk.js data.
  * It takes the following set of properties:
@@ -12,7 +12,7 @@ import { View as VtkItem } from '../AsyncReactVTK';
  *   - `cameraParallelProjection`: false
  *   - `showOrientationAxes`: true
  */
-export default function View(props) {
+export default function View(props: ViewProps) {
   return <React.Suspense fallback={null}><VtkItem {...props} /></React.Suspense>;
 };
 
@@ -65,88 +65,89 @@ View.defaultProps = {
   ],
   showOrientationAxes: true,
 };
-
-View.propTypes = {
+type ViewProps = {
   /**
-   * The ID used to identify this component.
+   * Current color value
    */
-  id: PropTypes.string,
+  id?: string;
+
 
   /**
    * Allow user to override the default View style { width: '100%', height: '100%' }
    */
-  style: PropTypes.object,
+  style?: object;
 
   /**
    * Allow user to provide custom className associated to root element
    */
-  className: PropTypes.string,
+  className?: string;
 
   /**
    * The color of the view background using 3 floating numbers
    * between 0-1 of Red, Green, Blue component.
    */
-  background: PropTypes.array,
+  background?: Array<number>;
 
   /**
    * Configure the interactions
    */
-  interactorSettings: PropTypes.array,
+  interactorSettings?: Array<object>;
 
   /**
    * Initial camera position from an object in [0,0,0]
    */
-  cameraPosition: PropTypes.array,
+  cameraPosition?: Array<number>;
 
   /**
    * Initial camera position from an object in [0,0,0]
    */
-  cameraViewUp: PropTypes.array,
+  cameraViewUp?: Array<number>;
 
   /**
-   * Use parallel projection (default: false)
+   * Use parallel projection (default?: false;
    */
-  cameraParallelProjection: PropTypes.bool,
+  cameraParallelProjection?: boolean;
 
   /**
    * Property use to trigger a render when changing.
    */
-  triggerRender: PropTypes.number,
+  triggerRender?: number;
 
   /**
    * Property use to trigger a resetCamera when changing.
    */
-  triggerResetCamera: PropTypes.number,
+  triggerResetCamera?: number;
 
   /**
    * List of picking listeners to bind. The supported values are `click` and `hover`. By default it is disabled (empty array).
    */
-  pickingModes: PropTypes.arrayOf(PropTypes.string),
+  pickingModes?: Array<'click' | 'hover' | 'select'>;
 
   /**
    * Read-only prop. To use this, make sure that `pickingModes` contains `click`.
    * This prop is updated when an element in the map is clicked. This contains
    * the picking info describing the object being clicked on.
    */
-  clickInfo: PropTypes.object,
+  clickInfo?: object;
 
   /**
    * Read-only prop. To use this, make sure that `pickingModes` contains `hover`.
    * This prop is updated when an element in the map is hovered. This contains
    * the picking info describing the object being hovered.
    */
-  hoverInfo: PropTypes.object,
+  hoverInfo?: object;
 
   /**
    * List of representation to show
    */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
+  children?: Array<React.ReactNode> | React.ReactNode;
+
 
   /**
    * Show/Hide orientation axes.
    */
-  showOrientationAxes: PropTypes.bool,
-};
+  showOrientationAxes?: boolean;
+
+
+} & DashComponentProps;
+

@@ -1,4 +1,3 @@
-# dash is required to call `build:py`
-dash[dev]>=1.15.0
--e .
-vtk
+git+https://github.com/plotly/dash.git@typescript-component-generator#egg=dash[dev]
+wheel
+build

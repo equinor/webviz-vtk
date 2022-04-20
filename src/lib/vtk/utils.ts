@@ -1,4 +1,4 @@
-import Base64 from '@kitware/vtk.js/Common/Core/Base64.js';
+import { toArrayBuffer } from '@kitware/vtk.js/Common/Core/Base64.js';
 
 const NUMPY_DTYPES = {
     int32: Int32Array,
@@ -22,7 +22,7 @@ export function toTypedArray(values, TypedArray) {
 
     if (values.dtype) {
         const { bvals, dtype } = values;
-        const arrayBuffer = Base64.toArrayBuffer(bvals);
+        const arrayBuffer = toArrayBuffer(bvals);
         return new NUMPY_DTYPES[dtype](arrayBuffer);
     }
 

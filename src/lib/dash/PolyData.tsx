@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { PolyData as VtkItem } from '../AsyncReactVTK';
-
+import { DashComponentProps } from '../props';
 /**
  * PolyData is exposing a vtkPolyData to a downstream filter
  * It takes the following set of properties:
@@ -14,7 +14,7 @@ import { PolyData as VtkItem } from '../AsyncReactVTK';
  * Cell connectivity helper property:
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
-export default function PolyData(props) {
+export default function PolyData(props: PolyDataProps) {
   return <React.Suspense fallback={null}><VtkItem {...props} /></React.Suspense>;
 };
 
@@ -24,49 +24,47 @@ PolyData.defaultProps = {
   connectivity: 'manual',
 };
 
-PolyData.propTypes = {
+type PolyDataProps = {
   /**
-   * The ID used to identify this component.
+   * Current color value
    */
-  id: PropTypes.string,
+  id?: string;
 
   /**
    * downstream connection port
    */
-  port: PropTypes.number,
+  port?: number;
 
   /**
    * xyz coordinates
    */
-  points: PropTypes.arrayOf(PropTypes.number),
+  points?: Array<number>;
 
   /**
    * verts cells
    */
-  verts: PropTypes.arrayOf(PropTypes.number),
+  verts?: Array<number>;
 
   /**
    * lines cells
    */
-  lines: PropTypes.arrayOf(PropTypes.number),
+  lines?: Array<number>;
 
   /**
    * polys cells
    */
-  polys: PropTypes.arrayOf(PropTypes.number),
+  polys?: Array<number>;
 
   /**
    * strips cells
    */
-  strips: PropTypes.arrayOf(PropTypes.number),
+  strips?: Array<number>;
 
   /**
    * Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`
    */
-  connectivity: PropTypes.string,
+  connectivity?: string,
 
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};
+  children?: Array<React.ReactNode> | React.ReactNode;
+
+} & DashComponentProps;

@@ -1,6 +1,7 @@
 from __future__ import print_function as _
 
 import os as _os
+from pathlib import Path
 import sys as _sys
 import json
 
@@ -31,56 +32,17 @@ _current_path = _os.path.dirname(_os.path.abspath(__file__))
 
 _this_module = _sys.modules[__name__]
 
-
 _js_dist = [
     {
-        "relative_package_path": "webviz_vtk.min.js",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/{1}.min.js".format(
-            package_name, __name__, __version__
-        ),
+        "relative_package_path": "webviz_vtk.js",
         "namespace": package_name,
-    },
-    {
-        "relative_package_path": "webviz_vtk.min.js.map",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/{1}.min.js.map".format(
-            package_name, __name__, __version__
-        ),
-        "namespace": package_name,
-        "dynamic": True,
-    },
-    {
-        "relative_package_path": "async-ReactVTK.js",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTK.js".format(
-            package_name, __name__, __version__
-        ),
-        "namespace": package_name,
-        "async": True,
-    },
-    {
-        "relative_package_path": "async-ReactVTK.js.map",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTK.js.map".format(
-            package_name, __name__, __version__
-        ),
-        "namespace": package_name,
-        "dynamic": True,
-    },
-    {
-        "relative_package_path": "async-ReactVTKClasses.js",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTKClasses.js".format(
-            package_name, __name__, __version__
-        ),
-        "namespace": package_name,
-        "async": True,
-    },
-    {
-        "relative_package_path": "async-ReactVTKClasses.js.map",
-        "external_url": "https://unpkg.com/{0}@{2}/{1}/async-ReactVTKClasses.js.map".format(
-            package_name, __name__, __version__
-        ),
-        "namespace": package_name,
-        "dynamic": True,
-    },
+    }
 ]
+
+for fn in Path(_basepath).glob("async*.js"):
+    _js_dist.append(
+        {"relative_package_path": fn.name, "namespace": package_name, "async": True}
+    )
 
 _css_dist = []
 

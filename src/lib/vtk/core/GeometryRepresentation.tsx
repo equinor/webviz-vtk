@@ -19,8 +19,27 @@ import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor.js'
  *   - pointSize: 1,
  *   - color: [1,1,1],
  */
-export default class GeometryRepresentation extends Component {
-    constructor(props) {
+export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
+    static defaultProps = {
+        colorMapPreset: 'erdc_rainbow_bright',
+        colorDataRange: [0, 1],
+        showCubeAxes: false,
+        showScalarBar: false,
+        scalarBarTitle: '',
+
+    }
+    validData: boolean
+    currentVisibility: boolean
+    actor: any
+    lookupTable: any
+    mapper: any
+    scalarBar: any
+    subscriptions: Array<any>
+    cubeAxes: any
+    view: any
+
+
+    constructor(props: GeometryRepresentationProps) {
         super(props);
 
         // Guard to prevent rendering if no data
@@ -30,10 +49,12 @@ export default class GeometryRepresentation extends Component {
         // Create vtk.js actor/mapper
         this.actor = vtkActor.newInstance({
             visibility: false,
+            // @ts-ignore
             representationId: props.id,
         });
         this.lookupTable = vtkColorTransferFunction.newInstance();
         this.mapper = vtkMapper.newInstance({
+            // @ts-ignore
             lookupTable: this.lookupTable,
             useLookupTableScalarRange: true,
         });
@@ -149,7 +170,7 @@ export default class GeometryRepresentation extends Component {
         this.lookupTable = null;
     }
 
-    update(props, previous) {
+    update(props, previous?) {
         const {
             cubeAxesStyle,
             showCubeAxes,
@@ -258,74 +279,66 @@ export default class GeometryRepresentation extends Component {
     }
 }
 
-GeometryRepresentation.defaultProps = {
-    colorMapPreset: 'erdc_rainbow_bright',
-    colorDataRange: [0, 1],
-    showCubeAxes: false,
-    showScalarBar: false,
-    scalarBarTitle: '',
-};
 
-GeometryRepresentation.propTypes = {
+type GeometryRepresentationProps = {
     /**
-     * The ID used to identify this component.
-     */
-    id: PropTypes.string,
+      * The ID used to identify this component.
+      */
+    id?: string;
 
     /**
      * Properties to set to the actor
      */
-    actor: PropTypes.object,
+    actor?: object;
 
     /**
      * Properties to set to the actor
      */
-    mapper: PropTypes.object,
+    mapper?: object;
 
     /**
      * Properties to set to the actor.property
      */
-    property: PropTypes.object,
+    property?: object;
 
     /**
      * Preset name for the lookup table color map
      */
-    colorMapPreset: PropTypes.string,
+    colorMapPreset?: string;
 
     /**
      * Data range use for the colorMap
      */
-    colorDataRange: PropTypes.arrayOf(PropTypes.number),
+    colorDataRange?: Array<number>;
 
     /**
      * Show/Hide Cube Axes for the given representation
      */
-    showCubeAxes: PropTypes.bool,
+    showCubeAxes?: boolean;
 
     /**
      * Configure cube Axes style by overriding the set of properties defined
-     * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+     * https?://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L71;
      */
-    cubeAxesStyle: PropTypes.object,
+    cubeAxesStyle?: object;
 
     /**
      * Show hide scalar bar for that representation
      */
-    showScalarBar: PropTypes.bool,
+    showScalarBar?: boolean;
 
     /**
      * Use given string as title for scalar bar. By default it is empty (no title).
      */
-    scalarBarTitle: PropTypes.string,
+    scalarBarTitle?: string;
 
     /**
      * Configure scalar bar style by overriding the set of properties defined
-     * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
+     * https?://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L79;
      */
-    scalarBarStyle: PropTypes.object,
+    scalarBarStyle?: object;
 
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node,
-    ]),
-};
+
+    children?: any;
+
+}

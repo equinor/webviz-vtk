@@ -15,7 +15,8 @@ It takes the following set of properties:
 Keyword arguments:
 
 - id (string; optional):
-    The ID used to identify this component.
+    Current color value   Unique ID to identify this component in Dash
+    callbacks.
 
 - name (string; default 'scalars'):
     Field name.

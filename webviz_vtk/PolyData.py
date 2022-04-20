@@ -17,10 +17,11 @@ Cell connectivity helper property:
 
 Keyword arguments:
 
-- children (list of a list of or a singular dash component, string or numbers | a list of or a singular dash component, string or number; optional)
+- children (boolean | number | string | dict | list; optional)
 
 - id (string; optional):
-    The ID used to identify this component.
+    Current color value   Unique ID to identify this component in Dash
+    callbacks.
 
 - connectivity (string; default 'manual'):
     Type of connectivity `manual` or implicit such as `points`,

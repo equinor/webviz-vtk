@@ -1,102 +1,72 @@
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
-const WebpackDashDynamicImport = require('@plotly/webpack-dash-dynamic-import');
 
 const packagejson = require('./package.json');
-
+const WebpackDashDynamicImport = require('@plotly/webpack-dash-dynamic-import');
 const dashLibraryName = packagejson.name.replace(/-/g, '_');
 
-module.exports = (env, argv) => {
-
-    let mode;
-
-    const overrides = module.exports || {};
-
-    // if user specified mode flag take that value
-    if (argv && argv.mode) {
-        mode = argv.mode;
+module.exports = function (env, argv) {
+    const mode = (argv && argv.mode) || 'production';
+    const entry = [path.join(__dirname, 'src/lib/index.ts')];
+    const output = {
+        path: path.join(__dirname, dashLibraryName),
+        filename: `${dashLibraryName}.js`,
+        library: dashLibraryName,
+        libraryTarget: 'umd',
+        chunkFilename: '[name].js',
     }
 
-    // else if configuration object is already set (module.exports) use that value
-    else if (overrides.mode) {
-        mode = overrides.mode;
-    }
-
-    // else take webpack default (production)
-    else {
-        mode = 'production';
-    }
-
-    let filename = (overrides.output || {}).filename;
-    if (!filename) {
-        const modeSuffix = mode === 'development' ? 'dev' : 'min';
-        filename = `${dashLibraryName}.${modeSuffix}.js`;
-    }
-
-    const entry = overrides.entry || { main: './src/lib/index.js' };
-
-    const devtool = overrides.devtool || 'source-map';
-
-    const externals = ('externals' in overrides) ? overrides.externals : ({
-        react: 'React',
-        'react-dom': 'ReactDOM',
-        'plotly.js': 'Plotly',
-        'prop-types': 'PropTypes',
-        // '@kitware/vtk.js': '@kitware/vtk.js',
-    });
+    const externals = {
+        react: {
+            commonjs: 'react',
+            commonjs2: 'react',
+            amd: 'react',
+            umd: 'react',
+            root: 'React',
+        },
+        'react-dom': {
+            commonjs: 'react-dom',
+            commonjs2: 'react-dom',
+            amd: 'react-dom',
+            umd: 'react-dom',
+            root: 'ReactDOM',
+        },
+    };
 
     return {
+        output,
         mode,
         entry,
-        output: {
-            path: path.resolve(__dirname, dashLibraryName),
-            chunkFilename: '[name].js',
-            filename,
-            library: dashLibraryName,
-            libraryTarget: 'window',
-        },
-        devtool,
+        target: 'web',
         externals,
+        resolve: {
+            extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        },
         module: {
             rules: [
                 {
-                    test: /\.jsx?$/,
+                    test: /\.(t|j)sx?$/,
+                    use: 'ts-loader',
                     exclude: /node_modules/,
-                    use: {
-                        loader: 'babel-loader'
-                    }
-                },
-                {
-                    test: /\.css$/,
+                }, {
+                    test: /\.s?css$/,
                     use: [
-                        {
-                            loader: 'style-loader',
-                            options: {
-                                insertAt: 'top'
-                            }
-                        },
+                        // {
+                        //     loader: MiniCssExtractPlugin.loader,
+                        //     options: {
+                        //         esModule: false,
+                        //     },
+                        // },
                         {
                             loader: 'css-loader',
                         },
+
                     ],
                 },
             ],
         },
         optimization: {
-            minimizer: [
-                new TerserPlugin({
-                    sourceMap: true,
-                    parallel: true,
-                    cache: './.build_cache/terser',
-                    terserOptions: {
-                        warnings: false,
-                        ie8: false
-                    }
-                })
-            ],
             splitChunks: {
-                name: true,
+
                 cacheGroups: {
                     async: {
                         chunks: 'async',
@@ -110,10 +80,7 @@ module.exports = (env, argv) => {
         },
         plugins: [
             new WebpackDashDynamicImport(),
-            new webpack.SourceMapDevToolPlugin({
-                filename: '[file].map',
-                exclude: ['async-plotlyjs']
-            })
         ]
+
     }
-};
+}

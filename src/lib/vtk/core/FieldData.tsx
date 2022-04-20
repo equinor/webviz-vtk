@@ -1,12 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataSetContext, FieldsContext } from './View';
 
 /**
  * FieldData is exposing a FieldData to a downstream element
  */
-export default function FieldData(props) {
+export default function FieldData(props: FieldDataProps) {
   return (
     <DataSetContext.Consumer>
       {(dataset) => (
@@ -18,11 +17,8 @@ export default function FieldData(props) {
   );
 }
 
-FieldData.defaultProps = {};
+type FieldDataProps = {
 
-FieldData.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};
+  children?: any;
+
+}

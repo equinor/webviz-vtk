@@ -1,12 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataSetContext, FieldsContext } from './View';
 
 /**
  * CellData is exposing a vtkCellData to a downstream element
  */
-export default function CellData(props) {
+export default function CellData(props: CellDataProps) {
   return (
     <DataSetContext.Consumer>
       {(dataset) => (
@@ -20,9 +19,8 @@ export default function CellData(props) {
 
 CellData.defaultProps = {};
 
-CellData.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};
+type CellDataProps = {
+
+  children?: any;
+
+}

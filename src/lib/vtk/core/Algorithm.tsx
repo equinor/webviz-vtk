@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { RepresentationContext, DownstreamContext } from './View';
 import { smartEqualsShallow } from '../utils';
@@ -12,9 +11,19 @@ import vtk from '@kitware/vtk.js/vtk.js';
  *   - vtkClass: vtkClassName
  *   - state: {}
  */
-export default class Algorithm extends Component {
-  constructor(props) {
+export default class Algorithm extends Component<AlgorithmProps> {
+  static defaultProps = {
+    port: 0,
+    vtkClass: 'vtkConeSource',
+    state: {}
+  }
+  algo: any
+  representation: any
+  downstream: any
+
+  constructor(props: AlgorithmProps) {
     super(props);
+
 
     // Create vtk.js algorithm
     this.algo = null;
@@ -65,7 +74,7 @@ export default class Algorithm extends Component {
     this.algo = null;
   }
 
-  update(props, previous) {
+  update(props, previous?) {
     const { vtkClass, state } = props;
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
@@ -106,35 +115,37 @@ export default class Algorithm extends Component {
   }
 }
 
-Algorithm.defaultProps = {
-  port: 0,
-  vtkClass: 'vtkConeSource',
-  state: {},
-};
+// Algorithm.defaultProps = {
+//   port: 0,
+//   vtkClass: 'vtkConeSource',
+//   state: {},
+// };
 
-Algorithm.propTypes = {
+
+
+type AlgorithmProps = {
   /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
+     * The ID used to identify this component.
+     */
+  id?: string;
 
   /**
    * downstream connection port
    */
-  port: PropTypes.number,
+  port?: number;
 
   /**
    * vtkClass name
    */
-  vtkClass: PropTypes.string,
+  vtkClass?: string;
 
   /**
    * set of property values for vtkClass
    */
-  state: PropTypes.object,
+  state?: object;
 
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};
+  children?: any;
+
+}
+
+

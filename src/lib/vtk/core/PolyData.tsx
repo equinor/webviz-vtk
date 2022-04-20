@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { toTypedArray, smartEqualsShallow } from '../utils';
 
@@ -22,8 +21,16 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData.js';
  * Cell connectivity helper property:
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
-export default class PolyData extends Component {
-    constructor(props) {
+export default class PolyData extends Component<PolyDataProps> {
+    static defaultProps = {
+        port: 0,
+        points: [],
+        connectivity: 'manual',
+    }
+    polydata: any
+    representation: any
+    downstream: any
+    constructor(props: PolyDataProps) {
         super(props);
 
         // Create vtk.js polydata
@@ -67,10 +74,10 @@ export default class PolyData extends Component {
         this.polydata = null;
     }
 
-    update(props, previous) {
+    update(props, previous?) {
         const { connectivity, points, verts, lines, polys, strips } = props;
         let changeDetected = false;
-        let typedArray = Uint32Array;
+        let typedArray: any = Uint32Array;
 
         if (points && (!previous || !smartEqualsShallow(points, previous.points))) {
             const array = toTypedArray(points, Float64Array);
@@ -173,84 +180,48 @@ export default class PolyData extends Component {
     }
 }
 
-PolyData.defaultProps = {
-    port: 0,
-    points: [],
-    connectivity: 'manual',
-};
 
-PolyData.propTypes = {
+
+type PolyDataProps = {
     /**
-     * The ID used to identify this component.
+     * Current color value
      */
-    id: PropTypes.string,
+    id?: string;
 
     /**
      * downstream connection port
      */
-    port: PropTypes.number,
+    port?: number;
 
     /**
      * xyz coordinates ([] | TypedArray | { bvals, dtype, shape })
      */
-    points: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.number),
-        PropTypes.object,
-        PropTypes.instanceOf(Float64Array),
-        PropTypes.instanceOf(Float32Array),
-    ]),
+    points?: Array<number> | object | Float64Array | Float32Array;
 
     /**
      * verts cells
      */
-    verts: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.number),
-        PropTypes.object,
-        PropTypes.instanceOf(Uint8Array),
-        PropTypes.instanceOf(Uint16Array),
-        PropTypes.instanceOf(Uint32Array),
-    ]),
+    verts?: Array<number> | object | Uint8Array |
+    Uint16Array | Uint32Array;
 
     /**
-     * lines cells
-     */
-    lines: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.number),
-        PropTypes.object,
-        PropTypes.instanceOf(Uint8Array),
-        PropTypes.instanceOf(Uint16Array),
-        PropTypes.instanceOf(Uint32Array),
-    ]),
+    * lines cells
+    */
+    lines?: Array<number> | object | Uint8Array | Uint16Array | Uint32Array;
 
     /**
-     * polys cells
-     */
-    polys: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.number),
-        PropTypes.object,
-        PropTypes.instanceOf(Uint8Array),
-        PropTypes.instanceOf(Uint16Array),
-        PropTypes.instanceOf(Uint32Array),
-    ]),
+    * polys cells
+    */
+    polys?: Array<number> | object | Uint8Array | Uint16Array | Uint32Array;
 
     /**
-     * strips cells
-     */
-    strips: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.number),
-        PropTypes.object,
-        PropTypes.instanceOf(Uint8Array),
-        PropTypes.instanceOf(Uint16Array),
-        PropTypes.instanceOf(Uint32Array),
-    ]),
+    * strips cells
+    */
+    strips?: Array<number> | object | Uint8Array | Uint16Array | Uint32Array;
 
     /**
      * Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`
      */
-    connectivity: PropTypes.string,
-
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node,
-    ]),
-};
+    connectivity?: string
+    children?: any;
+}

@@ -1,4 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
+### Webpack
+.build_cache
 ### VisualStudioCode template
 .vscode/*
 !.vscode/settings.json
@@ -273,10 +275,6 @@ bh_unicode_properties.cache
 # https://packagecontrol.io/packages/sublime-github
 GitHub.sublime-settings
 
-*hmr.js
-*hmr.json
-# webviz_vtk/output.js
-*deps
-*man
-.vscode/settings.json
-.build_cache
+# Julia manifest file names
+Manifest.toml
+JuliaManifest.toml
