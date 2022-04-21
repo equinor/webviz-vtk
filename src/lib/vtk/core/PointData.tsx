@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import { DataSetContext, FieldsContext } from './View';
@@ -7,14 +7,15 @@ import { DataSetContext, FieldsContext } from './View';
  * PointData is exposing a vtkPointData to a downstream element
  */
 export default function PointData(props) {
+    const dataset = useContext(DataSetContext)
+    if (!dataset) {
+        return null
+    }
     return (
-        <DataSetContext.Consumer>
-            {(dataset) => (
-                <FieldsContext.Provider value={dataset.getDataSet().getPointData()}>
-                    {props.children}
-                </FieldsContext.Provider>
-            )}
-        </DataSetContext.Consumer>
+        <FieldsContext.Provider value={dataset.getPointData()}>
+            {props.children}
+        </FieldsContext.Provider>
+
     );
 }
 

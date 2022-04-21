@@ -7,15 +7,14 @@ import { DataSetContext, FieldsContext } from './View';
  */
 export default function CellData(props: CellDataProps) {
   const dataset = useContext(DataSetContext)
-  if (dataset) {
-    return (
-
-      <FieldsContext.Provider value={dataset.getCellData()}>
-        {props.children}
-      </FieldsContext.Provider>
-    )
+  if (!dataset) {
+    return null
   }
-  return <div>No provider!</div>
+  return (
+    <FieldsContext.Provider value={dataset.getCellData()}>
+      {props.children}
+    </FieldsContext.Provider>
+  )
 
 }
 
