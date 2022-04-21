@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useContext } from 'react';
 
 import { toTypedArray, smartEqualsShallow } from '../utils';
 
+import usePreviousValue from '../usePreviousValue';
 import {
     RepresentationContext,
     DownstreamContext,
@@ -21,13 +22,7 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData.js';
  * Cell connectivity helper property:
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
-const usePreviousValue = (value) => {
-    const previousRef = useRef();
-    useEffect(() => {
-        previousRef.current = value;
-    }, [value]);
-    return previousRef.current
-}
+
 
 export default function PolyData(props: PolyDataProps) {
     const dataset = useRef(null);
