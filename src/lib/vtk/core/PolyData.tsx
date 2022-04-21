@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 
 import { toTypedArray, smartEqualsShallow } from '../utils';
 
@@ -21,67 +21,57 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData.js';
  * Cell connectivity helper property:
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
-export default class PolyData extends Component<PolyDataProps> {
-    static defaultProps = {
-        port: 0,
-        points: [],
-        connectivity: 'manual',
-    }
-    polydata: any
-    representation: any
-    downstream: any
-    constructor(props: PolyDataProps) {
-        super(props);
+const usePreviousValue = (value) => {
+    const previousRef = useRef();
+    useEffect(() => {
+        previousRef.current = value;
+    }, [value]);
+    return previousRef.current
+}
 
-        // Create vtk.js polydata
-        this.polydata = vtkPolyData.newInstance();
-    }
+export default function PolyData(props: PolyDataProps) {
+    const dataset = useRef(null);
+    const representation = useContext(RepresentationContext)
+    const downstream = useContext(DownstreamContext)
+    const prevProps = usePreviousValue(props);
 
-    render() {
-        return (
-            <RepresentationContext.Consumer>
-                {(representation) => (
-                    <DownstreamContext.Consumer>
-                        {(downstream) => {
-                            this.representation = representation;
-                            if (!this.downstream) {
-                                this.downstream = downstream;
-                            }
-                            return (
-                                <DataSetContext.Provider value={this}>
-                                    <div key={this.props.id} id={this.props.id}>
-                                        {this.props.children}
-                                    </div>
-                                </DataSetContext.Provider>
-                            );
-                        }}
-                    </DownstreamContext.Consumer>
-                )}
-            </RepresentationContext.Consumer>
-        );
-    }
+    useEffect(() => {
+        if (!dataset.current) {
+            let polydata = vtkPolyData.newInstance();
+            dataset.current = polydata
+        }
+        return () => {
+            dataset.current.delete()
+            dataset.current = { polydata: null }
+        }
+    }, [])
 
-    componentDidMount() {
-        this.update(this.props);
-    }
+    useEffect(() => {
+        if (dataset.current) {
+            update(props, prevProps)
+        }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this.update(this.props, prevProps);
-    }
+    }, [props])
 
-    componentWillUnmount() {
-        this.polydata.delete();
-        this.polydata = null;
-    }
+    return (
 
-    update(props, previous?) {
+        <DataSetContext.Provider value={dataset.current}>
+            <div key={props.id} id={props.id}>
+                {props.children}
+            </div>
+        </DataSetContext.Provider>
+
+    )
+
+    function update(props, previous?) {
         const { connectivity, points, verts, lines, polys, strips } = props;
+        const polydata = dataset.current
         let changeDetected = false;
         let typedArray: any = Uint32Array;
 
         if (points && (!previous || !smartEqualsShallow(points, previous.points))) {
             const array = toTypedArray(points, Float64Array);
-            this.polydata.getPoints().setData(array, 3);
+            polydata.getPoints().setData(array, 3);
             changeDetected = true;
 
             // Adapt cell size
@@ -91,22 +81,22 @@ export default class PolyData extends Component<PolyDataProps> {
         }
 
         if (verts && (!previous || !smartEqualsShallow(verts, previous.verts))) {
-            this.polydata.getVerts().setData(toTypedArray(verts, typedArray));
+            polydata.getVerts().setData(toTypedArray(verts, typedArray));
             changeDetected = true;
         }
 
         if (lines && (!previous || !smartEqualsShallow(lines, previous.lines))) {
-            this.polydata.getLines().setData(toTypedArray(lines, typedArray));
+            polydata.getLines().setData(toTypedArray(lines, typedArray));
             changeDetected = true;
         }
 
         if (polys && (!previous || !smartEqualsShallow(polys, previous.polys))) {
-            this.polydata.getPolys().setData(toTypedArray(polys, typedArray));
+            polydata.getPolys().setData(toTypedArray(polys, typedArray));
             changeDetected = true;
         }
 
         if (strips && (!previous || !smartEqualsShallow(strips, previous.strips))) {
-            this.polydata.getStrips().setData(toTypedArray(strips, typedArray));
+            polydata.getStrips().setData(toTypedArray(strips, typedArray));
             changeDetected = true;
         }
 
@@ -125,7 +115,7 @@ export default class PolyData extends Component<PolyDataProps> {
                         for (let i = 0; i < nbPoints; i++) {
                             values[i + 1] = i;
                         }
-                        this.polydata.getVerts().setData(values);
+                        polydata.getVerts().setData(values);
                         changeDetected = true;
                     }
                     break;
@@ -139,7 +129,7 @@ export default class PolyData extends Component<PolyDataProps> {
                             values[offset++] = i + 1;
                             values[offset++] = i + 2;
                         }
-                        this.polydata.getPolys().setData(values);
+                        polydata.getPolys().setData(values);
                         changeDetected = true;
                     }
                     break;
@@ -150,7 +140,7 @@ export default class PolyData extends Component<PolyDataProps> {
                         for (let i = 0; i < nbPoints; i++) {
                             values[i + 1] = i;
                         }
-                        this.polydata.getStrips().setData(values);
+                        polydata.getStrips().setData(values);
                         changeDetected = true;
                     }
                     break;
@@ -160,27 +150,24 @@ export default class PolyData extends Component<PolyDataProps> {
         }
 
         if (changeDetected) {
-            this.modified();
+            polydata.modified();
+            downstream.setInputData(polydata, props.port);
+
+            // Let the representation know that we have data
+            if (representation && polydata.getPoints().getData().length) {
+                representation.dataAvailable();
+                representation.dataChanged();
+            }
         }
     }
 
-    getDataSet() {
-        return this.polydata;
-    }
-
-    modified() {
-        this.polydata.modified();
-        this.downstream.setInputData(this.polydata, this.props.port);
-
-        // Let the representation know that we have data
-        if (this.representation && this.polydata.getPoints().getData().length) {
-            this.representation.dataAvailable();
-            this.representation.dataChanged();
-        }
-    }
 }
 
-
+PolyData.defaultProps = {
+    port: 0,
+    points: [],
+    connectivity: 'manual',
+}
 
 type PolyDataProps = {
     /**
