@@ -6,7 +6,7 @@ import { DataSetContext, FieldsContext } from './View';
 /**
  * PointData is exposing a vtkPointData to a downstream element
  */
-export default function PointData(props) {
+export default function PointData(props: PointDataProps) {
     const dataset = useContext(DataSetContext)
     if (!dataset) {
         return null
@@ -20,10 +20,8 @@ export default function PointData(props) {
 }
 
 PointData.defaultProps = {};
+type PointDataProps = {
 
-PointData.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node,
-    ]),
-};
+    children?: any;
+
+}
