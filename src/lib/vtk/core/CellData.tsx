@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import { DataSetContext, FieldsContext } from './View';
 
@@ -6,15 +6,17 @@ import { DataSetContext, FieldsContext } from './View';
  * CellData is exposing a vtkCellData to a downstream element
  */
 export default function CellData(props: CellDataProps) {
-  return (
-    <DataSetContext.Consumer>
-      {(dataset) => (
-        <FieldsContext.Provider value={dataset.getDataSet().getCellData()}>
-          {props.children}
-        </FieldsContext.Provider>
-      )}
-    </DataSetContext.Consumer>
-  );
+  const dataset = useContext(DataSetContext)
+  if (dataset) {
+    return (
+
+      <FieldsContext.Provider value={dataset.getCellData()}>
+        {props.children}
+      </FieldsContext.Provider>
+    )
+  }
+  return <div>No provider!</div>
+
 }
 
 CellData.defaultProps = {};
