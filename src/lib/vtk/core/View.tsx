@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+
+import { pick, pickClosest } from "../pickingUtils"
+import { assignManipulators } from '../manipulator';
 
 // ----------------------------------------------------------------------------
 // vtk.js Rendering stack
@@ -20,16 +22,6 @@ import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
 import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
 
-// Style modes
-import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
-import vtkMouseCameraTrackballPanManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
-import vtkMouseCameraTrackballRollManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator.js';
-import vtkMouseCameraTrackballRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator.js';
-import vtkMouseCameraTrackballZoomManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
-import vtkMouseCameraTrackballZoomToMouseManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
-import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
-import vtkMouseBoxSelectorManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseBoxSelectorManipulator.js';
-
 // Picking handling
 import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/HardwareSelector.js';
 import { FieldAssociations } from '@kitware/vtk.js/Common/DataModel/DataSet/Constants.js';
@@ -44,69 +36,6 @@ export const DataSetContext = React.createContext(null);
 export const FieldsContext = React.createContext(null);
 export const DownstreamContext = React.createContext(null);
 
-// ----------------------------------------------------------------------------
-// Helper constants
-// ----------------------------------------------------------------------------
-
-const manipulatorFactory = {
-    None: null,
-    Pan: vtkMouseCameraTrackballPanManipulator,
-    Zoom: vtkMouseCameraTrackballZoomManipulator,
-    Roll: vtkMouseCameraTrackballRollManipulator,
-    Rotate: vtkMouseCameraTrackballRotateManipulator,
-    MultiRotate: vtkMouseCameraTrackballMultiRotateManipulator,
-    ZoomToMouse: vtkMouseCameraTrackballZoomToMouseManipulator,
-    Select: vtkMouseBoxSelectorManipulator,
-};
-
-function assignManipulators(style, settings, view) {
-    style.removeAllMouseManipulators();
-    settings.forEach((item) => {
-        const klass = manipulatorFactory[item.action];
-        if (klass) {
-            const {
-                button,
-                shift,
-                control,
-                alt,
-                scrollEnabled,
-                dragEnabled,
-                useWorldUpVec,
-                worldUpVec,
-                useFocalPointAsCenterOfRotation,
-            } = item;
-            const manipulator = klass.newInstance();
-            manipulator.setButton(button);
-            manipulator.setShift(!!shift);
-            manipulator.setControl(!!control);
-            manipulator.setAlt(!!alt);
-            if (scrollEnabled !== undefined) {
-                manipulator.setScrollEnabled(scrollEnabled);
-            }
-            if (dragEnabled !== undefined) {
-                manipulator.setDragEnabled(dragEnabled);
-            }
-            style.addMouseManipulator(manipulator);
-            if (manipulator.onBoxSelectChange && view.onBoxSelectChange) {
-                manipulator.onBoxSelectChange(view.onBoxSelectChange);
-            }
-            if (useWorldUpVec !== undefined) {
-                manipulator.setUseWorldUpVec(useWorldUpVec);
-            }
-            if (worldUpVec !== undefined) {
-                manipulator.setWorldUpVec(worldUpVec);
-            }
-            if (useFocalPointAsCenterOfRotation !== undefined) {
-                manipulator.setUseFocalPointAsCenterOfRotation(
-                    useFocalPointAsCenterOfRotation
-                );
-            }
-        }
-    });
-
-    // Always add gesture
-    style.addGestureManipulator(vtkGestureCameraManipulator.newInstance());
-}
 
 // ----------------------------------------------------------------------------
 // Default css styles
@@ -304,10 +233,13 @@ export default class View extends Component<ViewProps> {
 
     getSelection(x: number, y: number): Array<any> {
         const tolerance = this.getPointerSizeTolerance();
-        return this.pickClosest(
+        return pickClosest(
             Math.floor(x),
             Math.floor(y),
-            tolerance
+            tolerance,
+            this.selector,
+            this.openglRenderWindow,
+            this.renderer
         );
     }
     updateCubeBounds = (): void => {
@@ -394,7 +326,7 @@ export default class View extends Component<ViewProps> {
             return;
         }
         const [x1, x2, y1, y2] = selection;
-        const pickResult = this.pick(x1, y1, x2, y2, true);
+        const pickResult = pick(x1, y1, x2, y2, this.selector, this.openglRenderWindow, this.renderer, true);
 
         // Share the selection with the rest of the world
         if (this.props.onSelect) {
@@ -631,158 +563,6 @@ export default class View extends Component<ViewProps> {
             );
         }
         this.renderWindow.render();
-    }
-
-    pickClosest(xp, yp, tolerance) {
-        const x1 = Math.floor(xp - tolerance);
-        const y1 = Math.floor(yp - tolerance);
-        const x2 = Math.ceil(xp + tolerance);
-        const y2 = Math.ceil(yp + tolerance);
-
-        this.selector.setArea(x1, y1, x2, y2);
-        this.previousSelectedData = null;
-
-        if (this.selector.captureBuffers()) {
-            const pos = [xp, yp];
-            const outSelectedPosition = [0, 0];
-            const info = this.selector.getPixelInformation(
-                pos,
-                tolerance,
-                outSelectedPosition
-            );
-
-            if (info == null || info.prop == null) return [];
-
-            const startPoint = this.openglRenderWindow.displayToWorld(
-                Math.round((x1 + x2) / 2),
-                Math.round((y1 + y2) / 2),
-                0,
-                this.renderer
-            );
-
-            const endPoint = this.openglRenderWindow.displayToWorld(
-                Math.round((x1 + x2) / 2),
-                Math.round((y1 + y2) / 2),
-                1,
-                this.renderer
-            );
-
-            const ray = [Array.from(startPoint), Array.from(endPoint)];
-
-            const worldPosition = Array.from(
-                this.openglRenderWindow.displayToWorld(
-                    info.displayPosition[0],
-                    info.displayPosition[1],
-                    info.zValue,
-                    this.renderer
-                )
-            );
-
-            const displayPosition = [
-                info.displayPosition[0],
-                info.displayPosition[1],
-                info.zValue,
-            ];
-
-            const selection = [];
-            selection[0] = {
-                worldPosition,
-                displayPosition,
-                compositeID: info.compositeID,
-                ...info.prop.get('representationId'),
-                ray,
-            };
-            return selection;
-        }
-        return [];
-    }
-
-    pick(x1, y1, x2, y2, useFrustrum = false) {
-        this.selector.setArea(x1, y1, x2, y2);
-        this.previousSelectedData = null;
-        if (this.selector.captureBuffers()) {
-            this.selections = this.selector.generateSelection(x1, y1, x2, y2) || [];
-            if (useFrustrum) {
-                const frustrum = [
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x2, y1, 0, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x2, y2, 0, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x1, y2, 0, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x2, y1, 1, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x2, y2, 1, this.renderer)
-                    ),
-                    Array.from(
-                        this.openglRenderWindow.displayToWorld(x1, y2, 1, this.renderer)
-                    ),
-                ];
-                const representationIds = [];
-                this.selections.forEach((v) => {
-                    const { prop } = v.getProperties();
-                    const representationId =
-                        prop?.get('representationId').representationId;
-                    if (representationId) {
-                        representationIds.push(representationId);
-                    }
-                });
-                return { frustrum, representationIds };
-            }
-            const ray = [
-                Array.from(
-                    this.openglRenderWindow.displayToWorld(
-                        Math.round((x1 + x2) / 2),
-                        Math.round((y1 + y2) / 2),
-                        0,
-                        this.renderer
-                    )
-                ),
-                Array.from(
-                    this.openglRenderWindow.displayToWorld(
-                        Math.round((x1 + x2) / 2),
-                        Math.round((y1 + y2) / 2),
-                        1,
-                        this.renderer
-                    )
-                ),
-            ];
-            return this.selections
-                .map((v) => {
-                    const { prop, compositeID, displayPosition } = v.getProperties();
-
-                    // Return false to mark this item for removal
-                    if (prop == null) return false;
-
-                    return {
-                        worldPosition: Array.from(
-                            this.openglRenderWindow.displayToWorld(
-                                displayPosition[0],
-                                displayPosition[1],
-                                displayPosition[2],
-                                this.renderer
-                            )
-                        ),
-                        displayPosition,
-                        compositeID, // Not yet useful unless GlyphRepresentation
-                        ...prop.get('representationId'),
-                        ray,
-                    };
-                })
-                .filter(Boolean);
-        }
-        return [];
     }
 }
 
