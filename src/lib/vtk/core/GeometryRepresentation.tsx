@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useRef, useContext } from 'react';
 
+import usePreviousValue from '../usePreviousValue';
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 import { vec2Equals } from '../utils';
 
@@ -19,111 +19,125 @@ import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor.js'
  *   - pointSize: 1,
  *   - color: [1,1,1],
  */
-export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
-    static defaultProps = {
-        colorMapPreset: 'erdc_rainbow_bright',
-        colorDataRange: [0, 1],
-        showCubeAxes: false,
-        showScalarBar: false,
-        scalarBarTitle: '',
 
-    }
-    validData: boolean
-    currentVisibility: boolean
-    actor: any
-    lookupTable: any
-    mapper: any
-    scalarBar: any
-    subscriptions: Array<any>
-    cubeAxes: any
-    view: any
+export default function GeometryRepresentation(props: GeometryRepresentationProps) {
+    const view = useContext(ViewContext)
+    const context = useRef(null)
+    const prevProps = usePreviousValue(props);
 
-
-    constructor(props: GeometryRepresentationProps) {
-        super(props);
-
-        // Guard to prevent rendering if no data
-        this.validData = false;
-        this.currentVisibility = true;
-
-        // Create vtk.js actor/mapper
-        this.actor = vtkActor.newInstance({
-            visibility: false,
+    useEffect(() => {
+        if (!context.current) {
+            const currentVisibility = true
+            const validData = false
+            const actor = vtkActor.newInstance({
+                visibility: false,
+                // @ts-ignore
+                representationId: props.id,
+            });
+            const lookupTable = vtkColorTransferFunction.newInstance();
+            const mapper = vtkMapper.newInstance({
+                // @ts-ignore
+                lookupTable: lookupTable,
+                useLookupTableScalarRange: true,
+            });
+            actor.setMapper(mapper)
+            // Scalar Bar
+            const scalarBar = vtkScalarBarActor.newInstance();
             // @ts-ignore
-            representationId: props.id,
-        });
-        this.lookupTable = vtkColorTransferFunction.newInstance();
-        this.mapper = vtkMapper.newInstance({
-            // @ts-ignore
-            lookupTable: this.lookupTable,
-            useLookupTableScalarRange: true,
-        });
-        this.actor.setMapper(this.mapper);
+            scalarBar.setScalarsToColors(lookupTable);
+            scalarBar.setVisibility(false);
+            const cubeAxis = null
+            const subscriptions = [];
+            context.current = { actor, lookupTable, mapper, scalarBar, subscriptions, cubeAxis, currentVisibility, validData }
 
-        // Scalar Bar
-        this.scalarBar = vtkScalarBarActor.newInstance();
-        this.scalarBar.setScalarsToColors(this.lookupTable);
-        this.scalarBar.setVisibility(false);
-
-        this.subscriptions = [];
-
-        if (props.showCubeAxes) {
-            this.initCubeAxes();
         }
-    }
+        return () => {
+            while (context.current.subscriptions.length) {
+                context.current.subscriptions.pop().unsubscribe();
+            }
 
-    initCubeAxes() {
-        this.cubeAxes = vtkCubeAxesActor.newInstance({
+            if (view && view.renderer) {
+                view.renderer.removeActor(context.current.scalarBar);
+                // view.renderer.removeActor(context.current.cubeAxes);
+                view.renderer.removeActor(context.current.actor);
+            }
+
+            context.current.scalarBar.delete();
+
+            if (context.current.cubeAxes) {
+                context.current.cubeAxes.delete();
+            }
+
+            context.current.actor.delete();
+
+            context.current.mapper.delete();
+
+            context.current.lookupTable.delete();
+            context.current = null
+        }
+    }, [])
+
+    useEffect(() => {
+        if (context.current) {
+            update(props, prevProps)
+        }
+
+    }, [props])
+
+
+
+    function initCubeAxes() {
+        context.current.cubeAxes = vtkCubeAxesActor.newInstance({
             visibility: false,
             dataBounds: [-1, 1, -1, 1, -1, 1],
         });
-        Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+        Array.from(context.current.cubeAxes.getActors()).forEach(({ setVisibility }) =>
             setVisibility(false)
         );
 
         const updateCubeAxes = () => {
-            if (this.mapper.getInputData()) {
-                if (this.subscriptions.length === 1) {
+            if (context.current.mapper.getInputData()) {
+                if (context.current.subscriptions.length === 1) {
                     // add input data as well
-                    this.subscriptions.push(
-                        this.mapper.getInputData().onModified(updateCubeAxes)
+                    context.current.subscriptions.push(
+                        context.current.mapper.getInputData().onModified(updateCubeAxes)
                     );
                 }
 
-                const bounds = this.mapper.getInputData().getBounds();
+                const bounds = context.current.mapper.getInputData().getBounds();
                 if (bounds[0] < bounds[1]) {
-                    if (this.cubeAxes) {
-                        this.cubeAxes.setDataBounds(bounds);
+                    if (context.current.cubeAxes) {
+                        context.current.cubeAxes.setDataBounds(bounds);
                     }
-                    if (this.view) {
-                        this.view.renderView();
+                    if (view) {
+                        view.renderView();
                     }
                 }
             }
         };
 
-        this.subscriptions.push(this.mapper.onModified(updateCubeAxes));
+        context.current.subscriptions.push(context.current.mapper.onModified(updateCubeAxes));
     }
 
     render() {
         return (
             <ViewContext.Consumer>
                 {(view) => {
-                    if (!this.view) {
-                        if (this.cubeAxes) {
-                            this.cubeAxes.setCamera(view.renderer.getActiveCamera());
-                            view.renderer.addActor(this.cubeAxes);
+                    if (!view) {
+                        if (context.current.cubeAxes) {
+                            context.current.cubeAxes.setCamera(view.renderer.getActiveCamera());
+                            view.renderer.addActor(context.current.cubeAxes);
                         }
 
-                        view.renderer.addActor(this.scalarBar);
-                        view.renderer.addActor(this.actor);
-                        this.view = view;
+                        view.renderer.addActor(context.current.scalarBar);
+                        view.renderer.addActor(context.current.actor);
+                        view = view;
                     }
                     return (
-                        <RepresentationContext.Provider value={this}>
-                            <DownstreamContext.Provider value={this.mapper}>
-                                <div key={this.props.id} id={this.props.id}>
-                                    {this.props.children}
+                        <RepresentationContext.Provider value={context.current}>
+                            <DownstreamContext.Provider value={context.current.mapper}>
+                                <div key={props.id} id={props.id}>
+                                    {props.children}
                                 </div>
                             </DownstreamContext.Provider>
                         </RepresentationContext.Provider>
@@ -133,44 +147,8 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
         );
     }
 
-    componentDidMount() {
-        this.update(this.props);
-    }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this.update(this.props, prevProps);
-    }
-
-    componentWillUnmount() {
-        while (this.subscriptions.length) {
-            this.subscriptions.pop().unsubscribe();
-        }
-
-        if (this.view && this.view.renderer) {
-            this.view.renderer.removeActor(this.scalarBar);
-            this.view.renderer.removeActor(this.cubeAxes);
-            this.view.renderer.removeActor(this.actor);
-        }
-
-        this.scalarBar.delete();
-        this.scalarBar = null;
-
-        if (this.cubeAxes) {
-            this.cubeAxes.delete();
-            this.cubeAxes = null;
-        }
-
-        this.actor.delete();
-        this.actor = null;
-
-        this.mapper.delete();
-        this.mapper = null;
-
-        this.lookupTable.delete();
-        this.lookupTable = null;
-    }
-
-    update(props, previous?) {
+    function update(props, previous?) {
         const {
             cubeAxesStyle,
             showCubeAxes,
@@ -183,13 +161,13 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
         let changed = false;
 
         if (actor && (!previous || actor !== previous.actor)) {
-            changed = this.actor.set(actor) || changed;
+            changed = context.current.actor.set(actor) || changed;
         }
         if (mapper && (!previous || mapper !== previous.mapper)) {
-            changed = this.mapper.set(mapper) || changed;
+            changed = context.current.mapper.set(mapper) || changed;
         }
         if (property && (!previous || property !== previous.property)) {
-            changed = this.actor.getProperty().set(property) || changed;
+            changed = context.current.actor.getProperty().set(property) || changed;
         }
 
         if (
@@ -198,9 +176,9 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
         ) {
             changed = true;
             const preset = vtkColorMaps.getPresetByName(colorMapPreset);
-            this.lookupTable.applyColorMap(preset);
-            this.lookupTable.setMappingRange(...colorDataRange);
-            this.lookupTable.updateRange();
+            context.current.lookupTable.applyColorMap(preset);
+            context.current.lookupTable.setMappingRange(...colorDataRange);
+            context.current.lookupTable.updateRange();
         }
 
         if (
@@ -208,78 +186,85 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
             (!previous || !vec2Equals(colorDataRange, previous.colorDataRange))
         ) {
             changed = true;
-            this.lookupTable.setMappingRange(...colorDataRange);
-            this.lookupTable.updateRange();
+            context.current.lookupTable.setMappingRange(...colorDataRange);
+            context.current.lookupTable.updateRange();
         }
 
-        if (showCubeAxes && this.cubeAxes == null) {
+        if (showCubeAxes && context.current.cubeAxes == null) {
             changed = true;
-            this.initCubeAxes();
+            context.current.initCubeAxes();
 
             if (
                 cubeAxesStyle &&
                 (!previous || cubeAxesStyle !== previous.cubeAxesStyle)
             ) {
-                this.cubeAxes.set(cubeAxesStyle);
+                context.current.cubeAxes.set(cubeAxesStyle);
             }
         }
 
         if (
-            this.cubeAxes != null &&
-            showCubeAxes !== this.cubeAxes.getVisibility()
+            context.current.cubeAxes != null &&
+            showCubeAxes !== context.current.cubeAxes.getVisibility()
         ) {
             changed = true;
-            this.cubeAxes.setVisibility(showCubeAxes && this.validData);
-            Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
-                setVisibility(showCubeAxes && this.validData)
+            context.current.cubeAxes.setVisibility(showCubeAxes && context.current.validData);
+            Array.from(context.current.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+                setVisibility(showCubeAxes && context.current.validData)
             );
         }
 
         // scalar bars
         changed =
-            this.scalarBar.setVisibility(props.showScalarBar && this.validData) ||
+            context.current.scalarBar.setVisibility(props.showScalarBar && context.current.validData) ||
             changed;
-        changed = this.scalarBar.setAxisLabel(props.scalarBarTitle) || changed;
-        changed = this.scalarBar.set(props.scalarBarStyle || {}) || changed;
+        changed = context.current.scalarBar.setAxisLabel(props.scalarBarTitle) || changed;
+        changed = context.current.scalarBar.set(props.scalarBarStyle || {}) || changed;
 
         // actor visibility
         if (actor && actor.visibility !== undefined) {
-            this.currentVisibility = actor.visibility;
+            context.current.currentVisibility = actor.visibility;
             changed =
-                this.actor.setVisibility(this.currentVisibility && this.validData) ||
+                context.current.actor.setVisibility(context.current.currentVisibility && context.current.validData) ||
                 changed;
         }
 
         if (changed) {
             // trigger render
-            this.dataChanged();
+            dataChanged();
         }
     }
 
-    dataAvailable() {
-        if (!this.validData) {
-            this.validData = true;
-            this.actor.setVisibility(this.currentVisibility);
-            this.scalarBar.setVisibility(this.props.showScalarBar);
-            if (this.cubeAxes) {
-                this.cubeAxes.setVisibility(this.props.showCubeAxes);
-                Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
-                    setVisibility(this.props.showCubeAxes)
+    function dataAvailable() {
+        if (!context.current.validData) {
+            context.current.validData = true;
+            context.current.actor.setVisibility(context.current.currentVisibility);
+            context.current.scalarBar.setVisibility(props.showScalarBar);
+            if (context.current.cubeAxes) {
+                context.current.cubeAxes.setVisibility(props.showCubeAxes);
+                Array.from(context.current.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+                    setVisibility(context.current.props.showCubeAxes)
                 );
             }
             // trigger render
-            this.dataChanged();
+            dataChanged();
         }
     }
 
-    dataChanged() {
-        if (this.view) {
-            this.view.renderView();
+    function dataChanged() {
+        if (view) {
+            view.renderView();
         }
     }
 }
 
+GeometryRepresentation.defaultProps = {
+    colorMapPreset: 'erdc_rainbow_bright',
+    colorDataRange: [0, 1],
+    showCubeAxes: false,
+    showScalarBar: false,
+    scalarBarTitle: '',
 
+}
 type GeometryRepresentationProps = {
     /**
       * The ID used to identify this component.
