@@ -15,7 +15,7 @@
     "build:js::dev": "webpack --mode development",
     "build:js": "webpack",
     "build:backends": "dash-generate-components ./src/lib/dash webviz_vtk -p package-info.json --ignore \\.test\\.",
-    "build": "npm run build:js && npm run build:backends",
+    "build": "npm run build:js::dev && npm run build:backends",
     "watch": "npm run build:js::dev -- --watch"
   },
   "devDependencies": {
