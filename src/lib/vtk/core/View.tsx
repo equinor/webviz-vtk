@@ -204,6 +204,8 @@ export default class View extends Component<ViewProps> {
   firstResetTimeout: any;
   mutationObserver: MutationObserver | null;
   updateRequired: boolean;
+  private lastButtonPressButton: number = -1;
+  private lastButtonPressPosXY: { x: number, y: number } = { x: 0, y: 0 };
 
   constructor(props: ViewProps) {
     super(props);
@@ -352,12 +354,7 @@ export default class View extends Component<ViewProps> {
     return position;
   }
 
-  handleMouseDown = (callback, { x, y }, event) => {
-    const selection = this.getSelection(x, y);
-    if (selection?.length) {
-      this.style.setCenterOfRotation(selection[0].worldPosition);
-    }
-  };
+
   handleKey = (e) => {
     if (!this.hasFocus) {
       return;
@@ -408,7 +405,7 @@ export default class View extends Component<ViewProps> {
     }
   };
   // Handle picking
-  handlePicking = (callback, pickingMode, { x, y }, event) => {
+  handlePicking_UNUSED = (callback, pickingMode, { x, y }, event) => {
     if (this.props.pickingModes.indexOf(pickingMode) === -1) {
       return;
     }
@@ -425,26 +422,41 @@ export default class View extends Component<ViewProps> {
       this.props.setProps({ [`${pickingMode}Info`]: selection[0] });
     }
   };
-  onClick = (e) =>
-    this.handlePicking(
-      this.props.onClick,
-      "click",
-      this.getScreenEventPositionFor(e),
-      e
-    );
-  onMouseDown = (e) =>
-    this.handleMouseDown(
-      this.props.onMouseDown,
-      this.getScreenEventPositionFor(e),
-      e
-    );
-  onMouseUp = (e) =>
-    this.handlePicking(
-      this.props.onMouseUp,
-      "mouseUp",
-      this.getScreenEventPositionFor(e),
-      e
-    );
+  onClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Do nothing - picking happens in onMouseUp()
+  }
+
+  onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    //console.log(`onMouseDown  button=${e.button}, clientX=${e.clientX}, clientY=${e.clientY}`)
+    this.lastButtonPressButton = e.button;
+    this.lastButtonPressPosXY = { x: e.clientX, y: e.clientY };
+  }
+
+  onMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    //console.log(`onMouseUp  button=${e.button}, clientX=${e.clientX}, clientY=${e.clientY}`)
+    //console.log(`this.lastButtonPressButton=${this.lastButtonPressButton}  this.lastButtonPressPosXY=${JSON.stringify(this.lastButtonPressPosXY)}`)
+
+    // Only do picking on a 'clean' left button press/click
+    if (e.button == 0 && this.lastButtonPressButton == 0 &&
+      Math.abs(this.lastButtonPressPosXY.x - e.clientX) < 2 &&
+      Math.abs(this.lastButtonPressPosXY.y - e.clientY) < 2) {
+      const pos = this.getScreenEventPositionFor(e)
+      const selection = this.getSelection(pos.x, pos.y)
+
+      // Currently, we always update the rotation point based on the pick result
+      if (selection?.length) {
+        this.style.setCenterOfRotation(selection[0].worldPosition);
+      }
+
+      // Only update clickInfo property (which in turn triggers dash callback) 
+      // if 'click' is amongst the allowed picking mode
+      if (this.props.pickingModes.indexOf("click") !== -1) {
+        if ('setProps' in this.props) {
+          this.props.setProps({ clickInfo: selection[0] });
+        }
+      }
+    }
+  }
   onMouseMove = (e) => this.hover(this.getScreenEventPositionFor(e), e);
   render() {
     const { id, children, style, className } = this.props;
@@ -611,7 +623,7 @@ export default class View extends Component<ViewProps> {
       cameraPosition &&
       (!previous ||
         JSON.stringify(cameraPosition) !==
-          JSON.stringify(previous.cameraPosition))
+        JSON.stringify(previous.cameraPosition))
     ) {
       const camera = this.renderer.getActiveCamera();
       camera.set({
