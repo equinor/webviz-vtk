@@ -136,6 +136,8 @@ export default class View extends Component<ViewProps> {
     background: [0.2, 0.3, 0.4],
     cameraPosition: [0, 0, 1],
     cameraViewUp: [0, 1, 0],
+    cameraFocalPoint: [0, 0, 0],
+    autoResetCamera: true,
     cameraParallelProjection: false,
     triggerRender: 0,
     triggerResetCamera: 0,
@@ -526,7 +528,6 @@ export default class View extends Component<ViewProps> {
         attributes: false,
       });
     }
-
     this.update(this.props);
     document.addEventListener("keyup", this.handleKey);
     this.resetCamera();
@@ -591,7 +592,9 @@ export default class View extends Component<ViewProps> {
       interactive,
       cameraPosition,
       cameraViewUp,
+      cameraFocalPoint,
       cameraParallelProjection,
+      autoResetCamera,
       triggerRender,
       triggerResetCamera,
       showCubeAxes,
@@ -615,23 +618,32 @@ export default class View extends Component<ViewProps> {
     ) {
       const camera = this.renderer.getActiveCamera();
       camera.setParallelProjection(cameraParallelProjection);
-      if (previous) {
+      if (previous && autoResetCamera) {
         this.resetCamera();
       }
     }
     if (
-      cameraPosition &&
-      (!previous ||
-        JSON.stringify(cameraPosition) !==
-        JSON.stringify(previous.cameraPosition))
+      (cameraPosition &&
+        (!previous ||
+          JSON.stringify(cameraPosition) !==
+          JSON.stringify(previous.cameraPosition))) ||
+      (cameraViewUp &&
+        (!previous ||
+          JSON.stringify(cameraViewUp) !==
+          JSON.stringify(previous.cameraViewUp))) ||
+      (cameraFocalPoint &&
+        (!previous ||
+          JSON.stringify(cameraFocalPoint) !==
+          JSON.stringify(previous.cameraFocalPoint)))
     ) {
+
       const camera = this.renderer.getActiveCamera();
       camera.set({
         position: cameraPosition,
         viewUp: cameraViewUp,
-        focalPoint: [0, 0, 0],
+        focalPoint: cameraFocalPoint,
       });
-      if (previous) {
+      if (previous && autoResetCamera) {
         this.resetCamera();
       }
     }
@@ -870,6 +882,20 @@ type ViewProps = {
    * Initial camera position from an object in [0,0,0]
    */
   cameraViewUp?: Array<number>;
+
+  /**
+    * Initial camera focal point from an object in [0,0,0]
+    */
+  cameraFocalPoint: Array<number>,
+
+  /**
+ * Whether to automatically call resetCamera() (default: true)
+ *
+ * When set to false, the user must explicitly provide camera
+ * properties. Note that the initial resetCamera() call will
+ * still occur upon component mount.
+ */
+  autoResetCamera: boolean,
 
   /**
    * Use parallel projection (default: false)
