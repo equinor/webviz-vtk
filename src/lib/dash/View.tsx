@@ -26,6 +26,8 @@ View.defaultProps = {
   background: [0.2, 0.3, 0.4],
   cameraPosition: [0, 0, 1],
   cameraViewUp: [0, 1, 0],
+  cameraFocalPoint: [0, 0, 0],
+  autoResetCamera: true,
   cameraParallelProjection: false,
   interactorSettings: [
     {
@@ -102,6 +104,20 @@ type ViewProps = {
    * Initial camera position from an object in [0,0,0]
    */
   cameraViewUp?: Array<number>;
+
+  /**
+    * Initial camera focal point from an object in [0,0,0]
+    */
+  cameraFocalPoint: Array<number>,
+
+  /**
+ * Whether to automatically call resetCamera() (default: true)
+ *
+ * When set to false, the user must explicitly provide camera
+ * properties. Note that the initial resetCamera() call will
+ * still occur upon component mount.
+ */
+  autoResetCamera: boolean,
 
   /**
    * Use parallel projection (default?: false;
