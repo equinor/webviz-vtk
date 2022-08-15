@@ -596,6 +596,34 @@
           "raw": "number[]"
         }
       },
+      "cameraFocalPoint": {
+        "description": "Initial camera focal point from an object in [0,0,0]",
+        "required": false,
+        "defaultValue": {
+          "value": "[0, 0, 0]",
+          "computed": false
+        },
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "number",
+            "raw": "number"
+          },
+          "raw": "number[]"
+        }
+      },
+      "autoResetCamera": {
+        "description": "Whether to automatically call resetCamera() (default: true)\n\nWhen set to false, the user must explicitly provide camera\nproperties. Note that the initial resetCamera() call will\nstill occur upon component mount.",
+        "required": false,
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        },
+        "type": {
+          "name": "bool",
+          "raw": "boolean"
+        }
+      },
       "cameraParallelProjection": {
         "description": "Use parallel projection (default?: false;",
         "required": false,
