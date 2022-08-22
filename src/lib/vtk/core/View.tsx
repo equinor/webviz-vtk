@@ -633,7 +633,7 @@ export default class View extends Component<ViewProps> {
       const camera = this.renderer.getActiveCamera();
       const vpSize = this.openglRenderWindow.getViewportSize(this.renderer)
       const vpAspectRatio = vpSize[1] > 0 ? vpSize[0]/vpSize[1] : 1.0;
-      console.log(`setting cameraParallelHorScale=${cameraParallelHorScale.toFixed(2)}`);
+      // console.log(`setting cameraParallelHorScale=${cameraParallelHorScale.toFixed(2)}`);
       camera.setParallelScale(cameraParallelHorScale/vpAspectRatio);
     }
 
@@ -641,9 +641,9 @@ export default class View extends Component<ViewProps> {
         (cameraViewUp &&     (!previous || JSON.stringify(cameraViewUp)     !== JSON.stringify(previous.cameraViewUp))) ||
         (cameraFocalPoint && (!previous || JSON.stringify(cameraFocalPoint) !== JSON.stringify(previous.cameraFocalPoint))) ) 
     {
-      console.log(`setting cameraPosition=  ${cameraPosition.map(v => v.toFixed(2)) }`);
-      console.log(`setting cameraFocalPoint=${cameraFocalPoint.map(v => v.toFixed(2)) }`);
-      console.log(`setting cameraViewUp=    ${cameraViewUp.map(v => v.toFixed(2)) }`);
+      // console.log(`setting cameraPosition=  ${cameraPosition.map(v => v.toFixed(2)) }`);
+      // console.log(`setting cameraFocalPoint=${cameraFocalPoint.map(v => v.toFixed(2)) }`);
+      // console.log(`setting cameraViewUp=    ${cameraViewUp.map(v => v.toFixed(2)) }`);
 
       const camera = this.renderer.getActiveCamera();
       camera.set({
