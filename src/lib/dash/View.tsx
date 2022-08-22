@@ -29,6 +29,7 @@ View.defaultProps = {
   cameraFocalPoint: [0, 0, 0],
   autoResetCamera: true,
   cameraParallelProjection: false,
+  cameraParallelHorScale: 1.0,
   interactorSettings: [
     {
       button: 1,
@@ -123,6 +124,12 @@ type ViewProps = {
    * Use parallel projection (default?: false;
    */
   cameraParallelProjection?: boolean;
+
+  /**
+   * Horizontal scaling used for parallel projection.
+   * Half of the width of the viewport in world-coordinate distances
+   */
+   cameraParallelHorScale?: number;
 
   /**
    * Property use to trigger a render when changing.
