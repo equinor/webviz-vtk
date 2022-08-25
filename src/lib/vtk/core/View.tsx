@@ -139,6 +139,7 @@ export default class View extends Component<ViewProps> {
     cameraFocalPoint: [0, 0, 0],
     autoResetCamera: true,
     cameraParallelProjection: false,
+    cameraParallelHorScale: 1.0,
     triggerRender: 0,
     triggerResetCamera: 0,
     interactorSettings: [
@@ -304,7 +305,14 @@ export default class View extends Component<ViewProps> {
   }
 
   applyRenderView() {
+    // Once we try and get some control over the viewpoint and projection, we cannot keep
+    // calling/triggering resetCamera() all the time since this will undo our view/projection changes.
+    // As a result, we get into trouble with the camera clipping range.
+    // Therefore, let's experiment with always resetting (which is really a recompute) the clipping range before we do a redraw.
+    this.renderer.resetCameraClippingRange();
+
     this.updateCubeBounds();
+
     this.renderWindow.render();
   }
   onEnter = () => {
@@ -594,6 +602,7 @@ export default class View extends Component<ViewProps> {
       cameraViewUp,
       cameraFocalPoint,
       cameraParallelProjection,
+      cameraParallelHorScale,
       autoResetCamera,
       triggerRender,
       triggerResetCamera,
@@ -611,31 +620,30 @@ export default class View extends Component<ViewProps> {
     ) {
       assignManipulators(this.style, interactorSettings, this);
     }
-    if (
-      cameraParallelProjection &&
-      (!previous ||
-        cameraParallelProjection !== previous.cameraParallelProjection)
-    ) {
+
+    if (cameraParallelProjection && (!previous || cameraParallelProjection !== previous.cameraParallelProjection)) {
       const camera = this.renderer.getActiveCamera();
       camera.setParallelProjection(cameraParallelProjection);
       if (previous && autoResetCamera) {
         this.resetCamera();
       }
     }
-    if (
-      (cameraPosition &&
-        (!previous ||
-          JSON.stringify(cameraPosition) !==
-          JSON.stringify(previous.cameraPosition))) ||
-      (cameraViewUp &&
-        (!previous ||
-          JSON.stringify(cameraViewUp) !==
-          JSON.stringify(previous.cameraViewUp))) ||
-      (cameraFocalPoint &&
-        (!previous ||
-          JSON.stringify(cameraFocalPoint) !==
-          JSON.stringify(previous.cameraFocalPoint)))
-    ) {
+
+    if (cameraParallelHorScale && (!previous || cameraParallelHorScale !== previous.cameraParallelHorScale)) {
+      const camera = this.renderer.getActiveCamera();
+      const vpSize = this.openglRenderWindow.getViewportSize(this.renderer)
+      const vpAspectRatio = vpSize[1] > 0 ? vpSize[0]/vpSize[1] : 1.0;
+      // console.log(`setting cameraParallelHorScale=${cameraParallelHorScale.toFixed(2)}`);
+      camera.setParallelScale(cameraParallelHorScale/vpAspectRatio);
+    }
+
+    if ((cameraPosition &&   (!previous || JSON.stringify(cameraPosition)   !== JSON.stringify(previous.cameraPosition))) ||
+        (cameraViewUp &&     (!previous || JSON.stringify(cameraViewUp)     !== JSON.stringify(previous.cameraViewUp))) ||
+        (cameraFocalPoint && (!previous || JSON.stringify(cameraFocalPoint) !== JSON.stringify(previous.cameraFocalPoint))) ) 
+    {
+      // console.log(`setting cameraPosition=  ${cameraPosition.map(v => v.toFixed(2)) }`);
+      // console.log(`setting cameraFocalPoint=${cameraFocalPoint.map(v => v.toFixed(2)) }`);
+      // console.log(`setting cameraViewUp=    ${cameraViewUp.map(v => v.toFixed(2)) }`);
 
       const camera = this.renderer.getActiveCamera();
       camera.set({
@@ -643,9 +651,13 @@ export default class View extends Component<ViewProps> {
         viewUp: cameraViewUp,
         focalPoint: cameraFocalPoint,
       });
+
       if (previous && autoResetCamera) {
         this.resetCamera();
       }
+
+      this.orientationWidget.updateMarkerOrientation();
+      this.updateRequired = true;
     }
 
     if (this.cubeAxes.setVisibility(showCubeAxes)) {
@@ -901,6 +913,12 @@ type ViewProps = {
    * Use parallel projection (default: false)
    */
   cameraParallelProjection?: boolean;
+
+  /**
+   * Horizontal scaling used for parallel projection.
+   * Half of the width of the viewport in world-coordinate distances
+   */
+   cameraParallelHorScale?: number;
 
   /**
    * Property use to trigger a render when changing.

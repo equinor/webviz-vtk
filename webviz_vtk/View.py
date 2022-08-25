@@ -35,6 +35,10 @@ Keyword arguments:
 - cameraFocalPoint (list of numbers; default [0, 0, 0]):
     Initial camera focal point from an object in [0,0,0].
 
+- cameraParallelHorScale (number; default 1):
+    Horizontal scaling used for parallel projection. Half of the width
+    of the viewport in world-coordinate distances.
+
 - cameraParallelProjection (boolean; default False):
     Use parallel projection (default?: False;.
 
@@ -79,12 +83,12 @@ Keyword arguments:
 - triggerResetCamera (number; default 0):
     Property use to trigger a resetCamera when changing."""
     @_explicitize_args
-    def __init__(self, children=None, id=Component.UNDEFINED, style=Component.UNDEFINED, className=Component.UNDEFINED, background=Component.UNDEFINED, interactorSettings=Component.UNDEFINED, cameraPosition=Component.UNDEFINED, cameraViewUp=Component.UNDEFINED, cameraFocalPoint=Component.UNDEFINED, autoResetCamera=Component.UNDEFINED, cameraParallelProjection=Component.UNDEFINED, triggerRender=Component.UNDEFINED, triggerResetCamera=Component.UNDEFINED, pickingModes=Component.UNDEFINED, clickInfo=Component.UNDEFINED, hoverInfo=Component.UNDEFINED, showOrientationAxes=Component.UNDEFINED, **kwargs):
-        self._prop_names = ['children', 'id', 'autoResetCamera', 'background', 'cameraFocalPoint', 'cameraParallelProjection', 'cameraPosition', 'cameraViewUp', 'className', 'clickInfo', 'hoverInfo', 'interactorSettings', 'pickingModes', 'showOrientationAxes', 'style', 'triggerRender', 'triggerResetCamera']
+    def __init__(self, children=None, id=Component.UNDEFINED, style=Component.UNDEFINED, className=Component.UNDEFINED, background=Component.UNDEFINED, interactorSettings=Component.UNDEFINED, cameraPosition=Component.UNDEFINED, cameraViewUp=Component.UNDEFINED, cameraFocalPoint=Component.UNDEFINED, autoResetCamera=Component.UNDEFINED, cameraParallelProjection=Component.UNDEFINED, cameraParallelHorScale=Component.UNDEFINED, triggerRender=Component.UNDEFINED, triggerResetCamera=Component.UNDEFINED, pickingModes=Component.UNDEFINED, clickInfo=Component.UNDEFINED, hoverInfo=Component.UNDEFINED, showOrientationAxes=Component.UNDEFINED, **kwargs):
+        self._prop_names = ['children', 'id', 'autoResetCamera', 'background', 'cameraFocalPoint', 'cameraParallelHorScale', 'cameraParallelProjection', 'cameraPosition', 'cameraViewUp', 'className', 'clickInfo', 'hoverInfo', 'interactorSettings', 'pickingModes', 'showOrientationAxes', 'style', 'triggerRender', 'triggerResetCamera']
         self._type = 'View'
         self._namespace = 'webviz_vtk'
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['children', 'id', 'autoResetCamera', 'background', 'cameraFocalPoint', 'cameraParallelProjection', 'cameraPosition', 'cameraViewUp', 'className', 'clickInfo', 'hoverInfo', 'interactorSettings', 'pickingModes', 'showOrientationAxes', 'style', 'triggerRender', 'triggerResetCamera']
+        self.available_properties = ['children', 'id', 'autoResetCamera', 'background', 'cameraFocalPoint', 'cameraParallelHorScale', 'cameraParallelProjection', 'cameraPosition', 'cameraViewUp', 'className', 'clickInfo', 'hoverInfo', 'interactorSettings', 'pickingModes', 'showOrientationAxes', 'style', 'triggerRender', 'triggerResetCamera']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()

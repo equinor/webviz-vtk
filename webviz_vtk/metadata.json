@@ -636,6 +636,18 @@
           "raw": "boolean"
         }
       },
+      "cameraParallelHorScale": {
+        "description": "Horizontal scaling used for parallel projection.\nHalf of the width of the viewport in world-coordinate distances",
+        "required": false,
+        "defaultValue": {
+          "value": "1",
+          "computed": false
+        },
+        "type": {
+          "name": "number",
+          "raw": "number"
+        }
+      },
       "triggerRender": {
         "description": "Property use to trigger a render when changing.",
         "required": false,
