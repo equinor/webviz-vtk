@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { DataSetContext, FieldsContext } from './View';
 
@@ -6,14 +6,15 @@ import { DataSetContext, FieldsContext } from './View';
  * FieldData is exposing a FieldData to a downstream element
  */
 export default function FieldData(props: FieldDataProps) {
+  const dataset = useContext(DataSetContext)
+  if (!dataset) {
+    return null
+  }
   return (
-    <DataSetContext.Consumer>
-      {(dataset) => (
-        <FieldsContext.Provider value={dataset.getDataSet().getFieldData()}>
-          {props.children}
-        </FieldsContext.Provider>
-      )}
-    </DataSetContext.Consumer>
+    <FieldsContext.Provider value={dataset.getFieldData()}>
+      {props.children}
+    </FieldsContext.Provider>
+
   );
 }
 
